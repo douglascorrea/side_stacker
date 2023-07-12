@@ -14,7 +14,7 @@ export function Cell({value}) {
               },
           )}
       >
-        {value}
+        {value !== 0 ? value : ''}
       </span>
         </div>
     );
