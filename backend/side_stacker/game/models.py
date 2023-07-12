@@ -21,15 +21,39 @@ class Game(models.Model):
         direction = movement['direction']
         row = self.board[row_num]
         if self.current_player == player:
+            empty_index = None
             if direction == 'L':
-                row[0] = self.current_player
+                i = 0
+                while i < len(row):
+                    piece = row[i]
+                    print(f"this piece is {piece} and i is {i}")
+                    if piece == 0:
+                        empty_index = i
+                        break
+                    i += 1
             else:
-                row[6] = self.current_player
-            self.board[row_num] = row
-            self.toggle_current_player()
-            self.save()
+                i = len(row) - 1
+                while i >= 0:
+                    piece = row[i]
+                    print(f"this piece is {piece} and i is {i}")
+                    if piece == 0:
+                        empty_index = i
+                        break
+                    i -= 1
+
+            print(f"empty_index is {empty_index}")
+            if empty_index is not None:
+                self.place_movement(empty_index, row, row_num)
+            else:
+                return {'title': 'Invalid movement', 'error': 'No space left in this row'}
         else:
-            print('invalid movement')
+            return {'title': 'Invalid movement', 'error': 'It is not your turn'}
+
+    def place_movement(self, empty_index, row, row_num):
+        row[empty_index] = self.current_player
+        self.board[row_num] = row
+        self.toggle_current_player()
+        self.save()
 
     def toggle_current_player(self):
         if self.current_player == 'X':
