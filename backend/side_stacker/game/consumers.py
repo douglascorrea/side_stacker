@@ -24,9 +24,10 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content, **kwargs):
         type = content['type']
         movement = content['movement']
+        player = content['player']
 
         if type == 'movement':
-            await self.execute_movement(self.game, movement)
+            await self.execute_movement(self.game, movement, player)
 
         await self.channel_layer.group_send(
             self.game_group_name, {'type': 'get_game_by_id', 'game_id': self.game_id}
@@ -41,8 +42,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
 
     @database_sync_to_async
-    def execute_movement(self, game: Game, movement: dict):
-        game.execute_movement(movement)
+    def execute_movement(self, game: Game, movement: dict, player: str):
+        game.execute_movement(movement, player)
         game.refresh_from_db()
 
     @database_sync_to_async

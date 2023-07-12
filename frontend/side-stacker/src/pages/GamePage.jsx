@@ -1,18 +1,24 @@
 import useWebSocket from 'react-use-websocket'
 import { Board } from '../components/Board.jsx'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { GameContext } from '../contexts/GameContext.jsx'
+import { useEffect } from 'react'
 
 function GamePage() {
-  //get game id from router
-  const { gameId } = useParams()
+  const { gameId, playerId } = useParams()
+  const navigate = useNavigate()
+  useEffect(() => {
+    console.log('playerId', playerId)
+    if (playerId !== 'X' && playerId !== 'O') {
+      console.log('not valid player id')
+      navigate('/error')
+    }
+  }, [playerId])
   const WS_URL = `ws://127.0.0.1:8000/ws/game/${gameId}/`
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(WS_URL, {
     share: true,
     retryOnError: true,
-    shouldReconnect: (_closeEvent) => {
-      console.log('caling while trying to reconnect', _closeEvent)
-      return true
-    },
+    shouldReconnect: (_closeEvent) => true,
     reconnectAttempts: 10,
     reconnectInterval: 1000,
     onOpen: () => {
@@ -24,22 +30,36 @@ function GamePage() {
   })
 
   const handleClick = (e, direction, row) => {
-    console.log(direction, row)
-    sendJsonMessage({ type: 'movement', movement: { direction, row } })
+    sendJsonMessage({
+      type: 'movement',
+      movement: { direction, row },
+      player: playerId,
+    })
     e.preventDefault()
   }
+  const board = (lastJsonMessage && lastJsonMessage.game.board) || []
 
-  const default_board = [
-    [0, 0, 0, 0, 0, 0, 'X'], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-    [0, 0, 0, 0, 0, 0, 0], // "O"
-  ]
-  const board = (lastJsonMessage && lastJsonMessage.game.board) || default_board
-  return <Board board={board} onRowClick={handleClick} />
+  const currentPlayer =
+    (lastJsonMessage && lastJsonMessage.game.current_player) || 'X'
+
+  const isMovementAllowed = currentPlayer === playerId
+
+  return (
+    <GameContext.Provider
+      value={{ board, onRowClick: handleClick, isMovementAllowed }}
+    >
+      {playerId === 'X' && (
+        <div className="justify-center mb-10 text-xl text-center">
+          <p>Share this Game Id to invite a player:</p>
+          <p>{gameId}</p>
+          <p>Or share this link directly</p>
+          <p>{`http://localhost:3000/game/${gameId}/O`}</p>
+        </div>
+      )}
+
+      <Board />
+    </GameContext.Provider>
+  )
 }
 
 export default GamePage

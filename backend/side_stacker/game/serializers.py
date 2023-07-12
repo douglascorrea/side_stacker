@@ -6,4 +6,4 @@ from game.models import Game
 class GameSerializer(ModelSerializer):
     class Meta:
         model = Game
-        fields = ['id', 'board', 'current_player']
+        fields = '__all__'

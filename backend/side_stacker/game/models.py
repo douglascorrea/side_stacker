@@ -16,17 +16,20 @@ class Game(models.Model):
     board = models.JSONField(default=initial_board)
     current_player = models.CharField(max_length=1, default='X')
 
-    def execute_movement(self, movement):
+    def execute_movement(self, movement, player):
         row_num = movement['row']
         direction = movement['direction']
         row = self.board[row_num]
-        if direction == 'L':
-            row[6] = self.current_player
+        if self.current_player == player:
+            if direction == 'L':
+                row[0] = self.current_player
+            else:
+                row[6] = self.current_player
+            self.board[row_num] = row
+            self.toggle_current_player()
+            self.save()
         else:
-            row[0] = self.current_player
-        self.board[row_num] = row
-        self.toggle_current_player()
-        self.save()
+            print('invalid movement')
 
     def toggle_current_player(self):
         if self.current_player == 'X':
