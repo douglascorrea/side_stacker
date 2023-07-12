@@ -1,7 +1,6 @@
 import { useContext } from 'react'
-import { GameContext } from '../contexts/GameContext.jsx'
-import { PlayButton } from './PlayButton.jsx'
-import { Cell } from './Cell.jsx'
+import { GameContext } from '@/contexts'
+import { PlayButton, Cell } from '.'
 
 export function Row({ cells, id }) {
   const { onRowClick } = useContext(GameContext)

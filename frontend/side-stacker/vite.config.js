@@ -8,4 +8,14 @@ export default defineConfig({
     port: 3000,
   },
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@/': '/src',
+      '@/pages': '/src/pages',
+      '@/components': '/src/components',
+      '@/contexts': '/src/contexts',
+      '@/api': '/src/api',
+      '@/utils': '/src/utils',
+    }
+  }
 })

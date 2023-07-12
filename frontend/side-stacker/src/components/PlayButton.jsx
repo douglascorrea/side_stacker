@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { GameContext } from '../contexts/GameContext.jsx'
+import { GameContext } from '@/contexts'
 import {
   ArrowLongLeftIcon,
   ArrowLongRightIcon,

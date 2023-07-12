@@ -1,31 +1,24 @@
-import useWebSocket from 'react-use-websocket'
-import { Notification } from '../components/Notification.jsx'
-import { Board } from '../components/Board.jsx'
-import { FlashMessage } from '../components/FlashMessage.jsx'
-import { useNavigate, useParams } from 'react-router-dom'
-import { GameContext } from '../contexts/GameContext.jsx'
 import { useEffect, useState } from 'react'
+import useWebSocket from 'react-use-websocket'
+import { BASE_WS_URL } from '@/utils'
+import { Notification, Board, FlashMessage } from '@/components'
+import { useNavigate, useParams } from 'react-router-dom'
+import { GameContext } from '@/contexts'
 
-function GamePage() {
+export function GamePage() {
   const [showNotification, setShowNotification] = useState(false)
   const [board, setBoard] = useState([])
   const [error, setError] = useState(false)
   const [isMovementAllowed, setIsMovementAllowed] = useState(true)
   const { gameId, playerId } = useParams()
   const navigate = useNavigate()
-  const WS_URL = `ws://127.0.0.1:8000/ws/game/${gameId}/`
+  const WS_URL = `${BASE_WS_URL}/game/${gameId}/`
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(WS_URL, {
     share: true,
     retryOnError: true,
     shouldReconnect: (_closeEvent) => true,
     reconnectAttempts: 10,
     reconnectInterval: 1000,
-    onOpen: () => {
-      console.log('FROM APP WebSocket connection established.')
-    },
-    onClose: () => {
-      console.log('CLOSING......')
-    },
   })
   useEffect(() => {
     if (playerId !== 'X' && playerId !== 'O') {
@@ -42,7 +35,7 @@ function GamePage() {
     }
   }, [lastJsonMessage, playerId, navigate])
 
-  const handleClick = (e, direction, row) => {
+  const handleMovement = (e, direction, row) => {
     sendJsonMessage({
       type: 'movement',
       movement: { direction, row },
@@ -57,7 +50,7 @@ function GamePage() {
 
   return (
     <GameContext.Provider
-      value={{ board, onRowClick: handleClick, isMovementAllowed }}
+      value={{ board, onRowClick: handleMovement, isMovementAllowed }}
     >
       {playerId === 'X' && <FlashMessage gameId={gameId} />}
       {showNotification && (
@@ -73,5 +66,3 @@ function GamePage() {
     </GameContext.Provider>
   )
 }
-
-export default GamePage

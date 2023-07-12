@@ -1,6 +1,6 @@
 import { useContext } from 'react'
-import { GameContext } from '../contexts/GameContext.jsx'
-import { Row } from './Row.jsx'
+import { GameContext } from '@/contexts'
+import { Row } from '.'
 
 export function Board() {
   const { board } = useContext(GameContext)

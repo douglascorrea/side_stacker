@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Transition } from '@headlessui/react'
 import {
   CheckCircleIcon,
@@ -48,15 +48,11 @@ export function Notification({ error, isError, handleDismiss, show }) {
               <div className="p-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    <Icon isError={isError}/>
+                    <Icon isError={isError} />
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5">
-                    <p className="text-sm font-medium text-gray-900">
-                      {title}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {message}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900">{title}</p>
+                    <p className="mt-1 text-sm text-gray-500">{message}</p>
                   </div>
                   <div className="ml-4 flex flex-shrink-0">
                     <button

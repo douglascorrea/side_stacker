@@ -1,7 +1,5 @@
-import { WelcomePage } from './pages/WelcomePage.jsx'
-import GamePage from './pages/GamePage.jsx'
 import { Layout } from './Layout.jsx'
-import ErrorPage from "./pages/ErrorPage.jsx";
+import { WelcomePage, GamePage, ErrorPage } from '@/pages'
 
 export const routes = [
   {

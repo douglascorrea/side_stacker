@@ -15,6 +15,17 @@ module.exports = {
       version: 'detect',
     },
     'import/resolver': {
+      alias: {
+        map: [
+          ['@/', './src'],
+          ['@/components', './src/components'],
+          ['@/pages', './src/pages'],
+          ['@/contexts', './src/contexts'],
+          ['@/api', './src/api'],
+          ['@/utils', './src/utils'],
+        ],
+        "extensions": [".ts", ".js", ".jsx", ".json", ".tsx"]
+      },
       node: {
         paths: [
           'src',
