@@ -9,6 +9,7 @@ export function GamePage() {
   const [showNotification, setShowNotification] = useState(false)
   const [board, setBoard] = useState([])
   const [error, setError] = useState(false)
+  const [winner, setWinner] = useState(null)
   const [isMovementAllowed, setIsMovementAllowed] = useState(true)
   const { gameId, playerId } = useParams()
   const navigate = useNavigate()
@@ -25,13 +26,15 @@ export function GamePage() {
       navigate('/error')
     }
     if (lastJsonMessage && lastJsonMessage.game) {
+      console.log(lastJsonMessage)
       setBoard(lastJsonMessage.game.board)
       setError(lastJsonMessage.error)
       setIsMovementAllowed(lastJsonMessage.game.current_player === playerId)
       setShowNotification(
         lastJsonMessage.error &&
-          lastJsonMessage.game.current_player === playerId,
+          lastJsonMessage.game.current_player !== playerId,
       )
+      setWinner(lastJsonMessage.game.winner_player)
     }
   }, [lastJsonMessage, playerId, navigate])
 
@@ -50,9 +53,13 @@ export function GamePage() {
 
   return (
     <GameContext.Provider
-      value={{ board, onRowClick: handleMovement, isMovementAllowed }}
+      value={{
+        board,
+        onRowClick: handleMovement,
+        isMovementAllowed: winner === null ? isMovementAllowed : false,
+      }}
     >
-      {playerId === 'X' && <FlashMessage gameId={gameId} />}
+      <FlashMessage gameId={gameId} winner={winner} playerId={playerId} />
       {showNotification && (
         <Notification
           error={error}
