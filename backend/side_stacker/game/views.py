@@ -11,4 +11,5 @@ class GameView(mixins.CreateModelMixin, generics.GenericAPIView):
     serializer_class = GameSerializer
 
     def post(self, request, *args, **kwargs):
+        print(request)
         return self.create(request, *args, **kwargs)
