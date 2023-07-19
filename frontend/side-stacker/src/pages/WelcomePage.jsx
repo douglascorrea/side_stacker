@@ -5,8 +5,8 @@ import { createNewGame } from '@/api'
 export function WelcomePage() {
   const navigate = useNavigate()
 
-  const onClickNewGame = async () => {
-    const game = await createNewGame()
+  const onClickNewGame = async (players) => {
+    const game = await createNewGame(players)
     navigate(`/game/${game.id}/X`)
   }
 
@@ -21,12 +21,22 @@ export function WelcomePage() {
     <ul className="text-center">
       <li className="mb-10">
         <button
-          onClick={onClickNewGame}
+            onClick={() => onClickNewGame(1)}
+            type="button"
+            className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          <PlusCircleIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+          CREATE 1 PLAYER GAME
+        </button>
+      </li>
+      <li className="mb-10">
+        <button
+          onClick={() => onClickNewGame(2)}
           type="button"
           className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           <PlusCircleIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-          CREATE NEW GAME
+          CREATE 2 PLAYERS GAME
         </button>
       </li>
 
