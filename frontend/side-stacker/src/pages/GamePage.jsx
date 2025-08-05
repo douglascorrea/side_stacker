@@ -10,6 +10,7 @@ export function GamePage() {
   const [board, setBoard] = useState([])
   const [error, setError] = useState(false)
   const [winner, setWinner] = useState(null)
+  const [players, setPlayers] = useState(null)
   const [isMovementAllowed, setIsMovementAllowed] = useState(true)
   const { gameId, playerId } = useParams()
   const navigate = useNavigate()
@@ -22,11 +23,7 @@ export function GamePage() {
     reconnectInterval: 1000,
   })
   useEffect(() => {
-    if (playerId !== 'X' && playerId !== 'O') {
-      navigate('/error')
-    }
     if (lastJsonMessage && lastJsonMessage.game) {
-      console.log(lastJsonMessage)
       setBoard(lastJsonMessage.game.board)
       setError(lastJsonMessage.error)
       setIsMovementAllowed(lastJsonMessage.game.current_player === playerId)
@@ -35,8 +32,15 @@ export function GamePage() {
           lastJsonMessage.game.current_player !== playerId,
       )
       setWinner(lastJsonMessage.game.winner_player)
+      setPlayers(lastJsonMessage.game.players)
     }
   }, [lastJsonMessage, playerId, navigate])
+
+  useEffect(() => {
+    if ((playerId !== 'X' && playerId !== 'O') || (playerId !== 'X' && players === 1)) {
+      navigate('/error')
+    }
+  }, [playerId, players, navigate])
 
   const handleMovement = (e, direction, row) => {
     sendJsonMessage({
@@ -59,7 +63,7 @@ export function GamePage() {
         isMovementAllowed: winner === null ? isMovementAllowed : false,
       }}
     >
-      <FlashMessage gameId={gameId} winner={winner} playerId={playerId} />
+      <FlashMessage gameId={gameId} winner={winner} playerId={playerId} players={players} />
       {showNotification && (
         <Notification
           error={error}

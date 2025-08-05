@@ -25,13 +25,12 @@ function ShowDecision({ decision }) {
   )
 }
 
-export function FlashMessage({ gameId, winner, playerId }) {
+export function FlashMessage({ gameId, winner, playerId, players }) {
   const [showShareMessage, setShowShareMessage] = useState(false)
   const [isWinner, setIsWinner] = useState(false)
   const [isLoser, setIsLoser] = useState(false)
-  console.log(winner, playerId)
   useEffect(() => {
-    if (playerId === 'X' && winner !== playerId) {
+    if (playerId === 'X' && winner !== playerId && players > 1) {
       setShowShareMessage(true)
     }
     if (winner === playerId) {
@@ -42,7 +41,7 @@ export function FlashMessage({ gameId, winner, playerId }) {
       setShowShareMessage(false)
       setIsLoser(true)
     }
-  }, [winner, playerId])
+  }, [winner, playerId, players])
 
   return (
     <>

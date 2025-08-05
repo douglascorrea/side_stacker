@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from random import choice
 
 
 def initial_board():
@@ -17,36 +18,46 @@ class Game(models.Model):
     board = models.JSONField(default=initial_board)
     current_player = models.CharField(max_length=1, default='X')
     winner_player = models.CharField(max_length=1, null=True)
+    players = models.IntegerField(default=2)
 
     def execute_movement(self, movement, player):
         row_num = movement['row']
         direction = movement['direction']
         row = self.board[row_num]
         if self.current_player == player:
-            empty_index = None
-            if direction == 'L':
-                i = 0
-                while i < len(row):
-                    piece = row[i]
-                    if piece == 0:
-                        empty_index = i
-                        break
-                    i += 1
-            else:
-                i = len(row) - 1
-                while i >= 0:
-                    piece = row[i]
-                    if piece == 0:
-                        empty_index = i
-                        break
-                    i -= 1
+            empty_index = self.check_if_empty_index(direction, row)
 
             if empty_index is not None:
-                self.place_movement(empty_index, row, row_num)
+                is_winner = self.place_movement(empty_index, row, row_num)
+                # if we are running a 1-player agains bot
+                if not is_winner and self.players == 1:
+                    bot_empty_index, row, row_num = self.find_random_empty_index()
+                    if bot_empty_index:
+                        self.place_movement(bot_empty_index, row, row_num)
             else:
                 return {'title': 'Invalid movement', 'error': 'No space left in this row'}
         else:
             return {'title': 'Invalid movement', 'error': 'It is not your turn'}
+
+    def check_if_empty_index(self, direction, row):
+        empty_index = None
+        if direction == 'L':
+            i = 0
+            while i < len(row):
+                piece = row[i]
+                if piece == 0:
+                    empty_index = i
+                    break
+                i += 1
+        else:
+            i = len(row) - 1
+            while i >= 0:
+                piece = row[i]
+                if piece == 0:
+                    empty_index = i
+                    break
+                i -= 1
+        return empty_index
 
     def check_winner(self, row_num, last_played_index, current_player):
         row = self.board[row_num]
@@ -188,12 +199,30 @@ class Game(models.Model):
     def place_movement(self, empty_index, row, row_num):
         row[empty_index] = self.current_player
         self.board[row_num] = row
-        if not self.check_winner(row_num, empty_index, self.current_player):
+        is_winner = self.check_winner(row_num, empty_index, self.current_player)
+        if not is_winner:
             self.toggle_current_player()
         self.save()
+        return is_winner
 
     def toggle_current_player(self):
         if self.current_player == 'X':
             self.current_player = 'O'
         else:
             self.current_player = 'X'
+
+    def find_random_empty_index(self):
+        if any(0 in nested_list for nested_list in self.board):
+            direction = choice(['L', 'R'])
+            row_num = choice(range(6))
+            row = self.board[row_num]
+            empty_index = self.check_if_empty_index(direction, row)
+            while not empty_index:
+                direction = choice(['L', 'R'])
+                row_num = choice(range(6))
+                row = self.board[row_num]
+                empty_index = self.check_if_empty_index(direction, row)
+            return empty_index, row, row_num
+        else:
+            return False
+
